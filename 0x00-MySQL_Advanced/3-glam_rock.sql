@@ -5,5 +5,19 @@
 -- You should use attributes formed and split for computing the lifespan
 -- Your script can be executed on any database
 
-SELECT band_name, COALESCE(split, 2022) - formed as lifespan FROM metal_bands
-WHERE style LIKE '%Glam rock%' ORDER BY lifespan DESC;
+SELECT 
+    band_name, 
+    DATEDIFF(IFNULL(`split`, '2022-01-01'), `formed`) / 365 AS lifespan
+FROM 
+    metal_bands
+WHERE 
+    band_name IN (
+        SELECT 
+            band_name
+        FROM 
+            metal_bands
+        WHERE 
+            FIND_IN_SET('Glam rock', main_style) > 0
+    )
+ORDER BY 
+    lifespan DESC;
