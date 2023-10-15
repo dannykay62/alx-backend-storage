@@ -1,14 +1,14 @@
--- Initial
-DROP TABLE IF EXISTS users;
+-- SQL script that creates a trigger that resets
+-- the attribute valid_email only when the email has been changed.
+-- Context: Nothing related to MySQL, but perfect for
+-- user email validation - distribute the logic to the database itself!
 
-CREATE TABLE IF EXISTS users (
-    id int not null AUTO_INCREMENT,
-    email varchar(255) not null,
-    name varchar(255),
-    valid_email boolean not null default 0,
-    PRIMARY KEY (id)
-);
-
-INSERT INTO users (email, name) VALUES ("bob@DYLAN.COM", "bOB");
-INSERT INTO users (email, name, valid_email) VALUES ("sylvie@dylan.com", "Sylvie", 1);
-INSERT INTO users (email, name, valid_email) VALUES ("jeane@dylan.com", "Jeane", 1);
+DELIMITER $$
+CREATE TRIGGER email_bool BEFORE UPDATE ON users
+FOR EACH ROW
+BEGIN
+    IF NEW.email <> OLD.email THEN
+    SET NEW.valid_email = 0;
+    END IF;
+END
+$$
